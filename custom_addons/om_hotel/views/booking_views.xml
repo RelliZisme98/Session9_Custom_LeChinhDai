@@ -1,0 +1,121 @@
+<odoo>
+    <record id="action_hotel_management_bookings" model="ir.actions.act_window">
+        <field name="name">Bookings</field>
+        <field name="res_model">hotel.management.booking</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>Manage bookings for hotel rooms.</p>
+        </field>
+    </record>
+
+    <!-- New Action for Booking 'New' State -->
+    <record id="action_hotel_management_new_bookings" model="ir.actions.act_window">
+        <field name="name">Booking Chờ Duyệt</field>
+        <field name="res_model">hotel.management.booking</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_booking_list"/>
+        <field name="domain">[('state', '=', 'draft')]</field> <!-- Filter only 'draft' bookings -->
+        <field name="context">{'search_default_draft': 1}</field> <!-- Default search filter -->
+        <field name="help" type="html">
+            <p>Manage bookings waiting for approval.</p>
+        </field>
+    </record>
+
+    <!-- Tạo server action để duyệt nhiều đơn -->
+<!--    <record id="action_approve_multiple_bookings" model="ir.actions.server">-->
+<!--        <field name="name">Approve Multiple Bookings</field>-->
+<!--        <field name="model_id" ref="model_hotel_management_booking"/>-->
+<!--        <field name="state">code</field>-->
+<!--        <field name="code">-->
+<!--            action = records.action_approve()-->
+<!--        </field>-->
+<!--    </record>-->
+    <record id="action_approve_multiple_bookings" model="ir.actions.server">
+        <field name="name">Approve Selected</field>
+        <field name="model_id" ref="model_hotel_management_booking"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="model_hotel_management_booking"/> <!-- Liên kết với mô hình -->
+        <field name="binding_type">action</field> <!-- Đưa vào menu Tác vụ -->
+        <field name="code">
+            action = records.action_approve()
+        </field>
+    </record>
+
+
+    <!-- List View for 'New' Bookings -->
+   <record id="view_booking_list" model="ir.ui.view">
+    <field name="name">booking.list</field>
+    <field name="model">hotel.management.booking</field>
+    <field name="arch" type="xml">
+        <list>
+            <field name="name"/>
+            <field name="customer_name"/>
+            <field name="hotel_id"/>
+            <field name="room_type"/>
+            <field name="room_id"/>
+            <field name="check_in_date"/>
+            <field name="check_out_date"/>
+            <field name="state"/>
+            <field name="payment_status" readonly="1"/>
+            <field name="payment_date" readonly="1"/>
+            <field name="payment_amount" readonly="1"/>
+<!--            <header>-->
+<!--                <button name="%(action_approve_multiple_bookings)d" type="action" string="Approve Selected" class="btn-primary"-->
+<!--                icon="fa-check" confirm="Are you sure to approve selected bookings?"/>-->
+<!--            </header>-->
+        </list>
+
+    </field>
+</record>
+
+ <!-- Form View  -->
+    <record id="view_booking_form" model="ir.ui.view">
+        <field name="name">booking.form</field>
+        <field name="model">hotel.management.booking</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="customer_name"/>
+<!--                        <field name="customer_id"/>-->
+                        <field name="booking_date"/>
+                        <field name="hotel_id"/>
+                        <field name="room_type"/>
+                        <field name="room_id"/>
+                        <field name="check_in_date"/>
+                        <field name="check_out_date"/>
+                        <field name="state"/>
+<!--                        # Thêm trường mới-->
+                        <field name="payment_status" readonly="1"/>
+                        <field name="payment_date" readonly="1"/>
+                        <field name="payment_amount" readonly="1"/>
+<!--                        # Thêm truong mới-->
+                        <field name="number_of_nights" readonly="1"/>
+                        <field name="sale_order_id" readonly="1"/>
+                        <field name="room_price" readonly="1"/>
+                        <field name="service_total" readonly="1"/>
+                        <field name="total_money" readonly="1"/>
+                    <!-- Nút Thanh toán (hiển thị nếu payment_status = 'unpaid') -->
+                     <button name="action_pay" type="object" string="Thanh toán" class="btn-primary"
+                           invisible="payment_status != 'unpaid'"/>
+                        <button name="action_create_sale_order" type="object" string="Create Invoice" class="btn-primary"/>
+
+                    </group>
+                     <group string="Services">
+                        <field name="service_ids">
+                            <list editable="bottom">
+                                <field name="name"/>
+                                <field name="price"/>
+                                <field name="service_type"/>
+                            </list>
+                        </field>
+                    </group>
+<!--                    <footer>-->
+<!--                        <button name="action_create_sale_order" type="object" string="Create Invoice" class="btn-primary"/>-->
+<!--                    </footer>-->
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
