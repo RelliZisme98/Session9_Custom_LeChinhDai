@@ -1,1 +1,1 @@
-from . import hotel, booking, room, room_feature, hotel_management, booking_payment_wizard, hotel_service
+from . import hotel, booking, room, room_feature, hotel_management, booking_payment_wizard, hotel_service, hotel_sale_order

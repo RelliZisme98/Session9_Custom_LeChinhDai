@@ -100,6 +100,7 @@
                      <button name="action_pay" type="object" string="Thanh toán" class="btn-primary"
                            invisible="payment_status != 'unpaid'"/>
                         <button name="action_create_sale_order" type="object" string="Create Invoice" class="btn-primary"/>
+                    <button name="%(sale.action_orders)d" type="action" string="View Sale Order" class="btn-primary" context="{'active_id': sale_order_id}" invisible="not sale_order_id"/>
 
                     </group>
                      <group string="Services">

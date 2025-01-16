@@ -62,6 +62,26 @@ class Booking(models.Model):
             record.service_total = sum(service.price for service in record.service_ids)
 
 
+   # Tính tổng tiền:
+    @api.depends('room_price', 'number_of_nights', 'service_total', 'sale_order_id')
+    def _compute_total_money(self):
+        for record in self:
+            # Tính tổng tiền phòng và dịch vụ
+            total_without_tax = (record.room_price * record.number_of_nights) + record.service_total
+
+            # Nếu có sale_order_id, lấy thông tin thuế từ sale.order
+            if record.sale_order_id:
+                # Tổng thuế từ đơn hàng
+                tax_amount = sum(
+                    line.tax_id.amount * line.price_subtotal / 100 for line in record.sale_order_id.order_line if
+                    line.tax_id)
+                # Cập nhật tổng tiền bao gồm thuế
+                record.total_money = total_without_tax + tax_amount
+            else:
+                # Nếu không có sale_order, chỉ tính tiền phòng và dịch vụ
+                record.total_money = total_without_tax
+
+    # Tạo hóa đơn từ đơn hàng:
     @api.model
     def write(self, vals):
         result = super(Booking, self).write(vals)
@@ -92,56 +112,8 @@ class Booking(models.Model):
                     # Cập nhật lại tổng tiền trong đơn hàng (total_money)
                     sale_order.amount_total = record.total_money
                     # sale_order.recompute_prices() # Cập nhật lại tổng tiền trong đơn hàng
+                    record._compute_total_money()  # Ensure total_money is updated in booking
         return result
-    # Tính tổng tiền:
-    # @api.depends('room_price', 'service_total')
-    # def _compute_total_money(self):
-    #     for record in self:
-    #         record.total_money = (record.room_price * record.number_of_nights) + record.service_total
-        # Tính tổng tiền (bao gồm tiền phòng và tiền dịch vụ)
-    # @api.depends('room_price', 'number_of_nights', 'service_total')
-    # def _compute_total_money(self):
-    #     for record in self:
-    #         record.total_money = (record.room_price * record.number_of_nights) + record.service_total
-    # Tính tổng tiền (bao gồm tiền phòng và tiền dịch vụ, cộng cả thuế từ sale.order)
-    @api.depends('room_price', 'number_of_nights', 'service_total', 'sale_order_id')
-    def _compute_total_money(self):
-        for record in self:
-            # Tính tổng tiền phòng và dịch vụ
-            total_without_tax = (record.room_price * record.number_of_nights) + record.service_total
-
-            # Nếu có sale_order_id, lấy thông tin thuế từ sale.order
-            if record.sale_order_id:
-                # Tổng thuế từ đơn hàng
-                tax_amount = sum(
-                    line.tax_id.amount * line.price_subtotal / 100 for line in record.sale_order_id.order_line if
-                    line.tax_id)
-                # Cập nhật tổng tiền bao gồm thuế
-                record.total_money = total_without_tax + tax_amount
-            else:
-                # Nếu không có sale_order, chỉ tính tiền phòng và dịch vụ
-                record.total_money = total_without_tax
-    # Tạo hóa đơn:
-    # def action_create_invoice(self):
-    #     self.ensure_one()
-    #     invoice_vals = {
-    #         'partner_id': self.customer_id.id,
-    #         'type': 'out_invoice',
-    #         'invoice_line_ids': [
-    #             (0, 0, {
-    #                 'name': f'Room booking for {self.number_of_nights} nights',
-    #                 'quantity': self.number_of_nights,
-    #                 'price_unit': self.room_price,
-    #             }),
-    #             *[(0, 0, {
-    #                 'name': service.name,
-    #                 'quantity': 1,
-    #                 'price_unit': service.price,
-    #             }) for service in self.service_ids]
-    #         ],
-    #     }
-    #     invoice = self.env['account.move'].create(invoice_vals)
-    #     return invoice
 
     def action_create_sale_order(self):
         self.ensure_one()
@@ -288,25 +260,6 @@ class Booking(models.Model):
         return super(Booking, self).create(vals)
 
 
-
-# Đảm bảo khi booking được confirm thì trạng thái của phòng cũng được cập nhật:
-
-    # def confirm_booking(self):
-    #     for record in self:
-    #         _logger.info('Booking confirmed: %s by user %s', record.name, self.env.user.name)
-    #         record.state = 'confirmed'
-    #         record.room_id.state = 'booked'
-    #
-    #         # Create a booking history record
-    #         self.env['hotel.management.booking'].create({
-    #             'customer_id': record.customer_name,
-    #             'hotel_id': record.hotel_id.id,
-    #             'room_id': record.room_id.id,
-    #             'check_in_date': record.check_in_date,
-    #             'check_out_date': record.check_out_date,
-    #             'state': 'confirmed',
-    #         })
-    #
 
     @api.depends('sale_order_id.invoice_ids.state', 'sale_order_id.invoice_ids.payment_state')
     def _compute_payment_status_from_invoice(self):
