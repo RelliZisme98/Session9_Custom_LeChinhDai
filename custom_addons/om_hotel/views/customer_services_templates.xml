@@ -1,0 +1,29 @@
+<odoo>
+      <record id="action_hotel_management_services" model="ir.actions.act_url">
+        <field name="name">Hotel Services</field>
+        <field name="type">ir.actions.act_url</field>
+        <field name="url">/hotel/services</field>
+        <field name="target">self</field>
+    </record>
+<template id="template_services" name="Hotel Services">
+    <t t-call="website.layout">
+        <div class="container">
+            <h1>Danh sách dịch vụ</h1>
+            <ul class="list-group">
+                <t t-foreach="services" t-as="service">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <strong><t t-esc="service.name"/></strong>
+                            <t t-esc="service.price_total"/> VND
+                        </span>
+                        <form action="/hotel/order_service" method="post">
+                            <input type="hidden" name="service_id" t-att-value="service.id"/>
+                            <button type="submit" class="btn btn-success">Đặt dịch vụ</button>
+                        </form>
+                    </li>
+                </t>
+            </ul>
+        </div>
+    </t>
+</template>
+</odoo>

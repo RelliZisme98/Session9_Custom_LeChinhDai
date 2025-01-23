@@ -1,0 +1,230 @@
+<odoo>
+<record id="action_hotel_management_available_rooms" model="ir.actions.act_url">
+        <field name="name">Available Rooms</field>
+        <field name="type">ir.actions.act_url</field>
+        <field name="url">/rooms</field>
+        <field name="target">self</field>
+    </record>
+
+<template id="template_available_rooms" name="Available Rooms">
+    <t t-call="website.layout">  <!-- Bao bọc trong website layout -->
+        <div class="container">
+            <h1>Available Rooms</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Room Number</th>
+                        <th>Bed Type</th>
+                        <th>Price (Weekday)</th>
+                        <th>Price (Weekend)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="rooms" t-as="room">
+                        <tr>
+                            <td><t t-esc="room.name"/></td>
+                            <td><t t-esc="room.bed_type"/></td>
+                            <td><t t-esc="room.weekday_price"/></td>
+                            <td><t t-esc="room.weekend_price"/></td>
+                            <td>
+                                  <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                  <input type="hidden" name="room_id" t-att-value="room.id"/>
+<!--                                  <input type="date" name="check_in_date" required="required"/>-->
+<!--                                  <input type="date" name="check_out_date" required="required"/>-->
+<!--                                  <button type="submit" class="btn btn-primary">Proceed to Booking</button>-->
+                                <a t-att-href="'/book/room/%d' % room.id" class="btn btn-primary">Book Now</a>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </t>
+</template>
+
+    <template id="portal_booking_form" name="Booking Form">
+    <t t-call="website.layout">
+        <div class="container mt-5">
+            <h2>Book a Room: <t t-esc="room.name"/></h2>
+            <form action="/submit/booking" method="POST">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="room_id" t-att-value="room.id"/>
+                <input type="hidden" name="hotel_id" t-att-value="room.hotel_id.id"/>
+
+                <div class="form-group">
+                    <label for="customer_name">Full Name</label>
+                    <input type="text" id="customer_name" name="customer_name" t-att-value="request.env.user.name" class="form-control" required="required"/>
+                </div>
+                <div class="form-group">
+                    <label for="check_in_date">Check-in Date</label>
+                    <input type="date" id="check_in_date" name="check_in_date" class="form-control" required="required"/>
+                </div>
+                <div class="form-group">
+                    <label for="check_out_date">Check-out Date</label>
+                    <input type="date" id="check_out_date" name="check_out_date" class="form-control" required="required"/>
+                </div>
+                <div class="form-group">
+                    <label for="room_type">Room Type</label>
+                    <select id="room_type" name="room_type" class="form-control" required="required">
+                        <option value="single">Single Bed</option>
+                        <option value="double">Double Bed</option>
+                    </select>
+                </div>
+
+                <!-- Free Services Section -->
+                <div class="form-group">
+                    <label>Free Services:</label>
+                    <div>
+                        <t t-foreach="free_services" t-as="service">
+                            <div>
+                                <input type="checkbox" name="free_services" t-att-value="service.id"/>
+                                <label>
+                                    <t t-esc="service.name"/>
+                                </label>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Paid Services Section -->
+                <div class="form-group">
+                    <label>Paid Services:</label>
+                    <div>
+                        <t t-foreach="paid_services" t-as="service">
+                            <div>
+                                <input type="checkbox" name="paid_services" t-att-value="service.id"/>
+                                <label>
+                                    <t t-esc="service.name"/>
+                                    <!-- Hiển thị giá dựa vào service_line_ids -->
+                                    <t t-if="service.service_line_ids">
+                                        (<t t-foreach="service.service_line_ids" t-as="line">
+                                            <t t-esc="line.unit_price"/> VND
+                                        </t>)
+                                    </t>
+                                </label>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Booking</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+<!--<template id="portal_booking_form" name="Booking Form">-->
+<!--    <t t-call="website.layout">-->
+<!--        <div class="container mt-5">-->
+<!--            <h2>Book a Room: <t t-esc="room.name"/></h2>-->
+<!--            <form action="/submit/booking" method="POST">-->
+<!--                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>-->
+<!--                <input type="hidden" name="room_id" t-att-value="room.id"/>-->
+<!--                <input type="hidden" name="hotel_id" t-att-value="room.hotel_id.id"/>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label for="customer_name">Full Name</label>-->
+<!--                    <input type="text" id="customer_name" name="customer_name" t-att-value="request.env.user.name" class="form-control" required="required"/>-->
+<!--                </div>-->
+<!--                <div class="form-group">-->
+<!--                    <label for="check_in_date">Check-in Date</label>-->
+<!--                    <input type="date" id="check_in_date" name="check_in_date" class="form-control" required="required"/>-->
+<!--                </div>-->
+<!--                <div class="form-group">-->
+<!--                    <label for="check_out_date">Check-out Date</label>-->
+<!--                    <input type="date" id="check_out_date" name="check_out_date" class="form-control" required="required"/>-->
+<!--                </div>-->
+<!--                <div class="form-group">-->
+<!--                    <label for="room_type">Room Type</label>-->
+<!--                    <select id="room_type" name="room_type" class="form-control" required="required">-->
+<!--                        <option value="single">Single Bed</option>-->
+<!--                        <option value="double">Double Bed</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label>Additional Services</label>-->
+<!--                    <div>-->
+<!--                        <t t-foreach="services" t-as="service">-->
+<!--                            <div>-->
+<!--                                <input type="checkbox" name="services" t-att-value="service.id"/> <t t-esc="service.name"/>-->
+<!--                            </div>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <button type="submit" class="btn btn-primary">Submit Booking</button>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </t>-->
+<!--</template>-->
+
+
+<template id="portal_my_bookings" name="My Bookings">
+    <t t-call="website.layout">
+        <div class="container mt-5">
+            <h2>My Bookings</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Booking Reference</th>
+                        <th>Room</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="bookings" t-as="booking">
+                        <tr>
+                            <td><t t-esc="booking.name"/></td>
+                            <td><t t-esc="booking.room_id.name"/></td>
+                            <td><t t-esc="booking.check_in_date"/></td>
+                            <td><t t-esc="booking.check_out_date"/></td>
+                            <td><t t-esc="booking.state"/></td>
+                            <td><t t-esc="booking.total_money"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </t>
+</template>
+
+
+<!--<template id="template_booking_confirmation" name="Booking Confirmation">-->
+<!--    <t t-call="website.layout">-->
+<!--        <div class="container">-->
+<!--              <h1>Booking Confirmation</h1>-->
+<!--            <p>Your booking for <strong><t t-esc="room.name"/></strong> has been confirmed!</p>-->
+<!--            <p><strong>Check-in Date:</strong> <t t-esc="check_in_date"/></p>-->
+<!--            <p><strong>Check-out Date:</strong> <t t-esc="check_out_date"/></p>-->
+<!--            <p><strong>Total Price:</strong> <t t-esc="total_price"/> VNĐ</p>-->
+<!--            <a href="/hotel/available_rooms" class="btn btn-primary">Go Back to Home</a>-->
+<!--            <p>Thank you for booking with us!</p>-->
+<!--        </div>-->
+<!--    </t>-->
+<!--</template>-->
+
+<!--    <template id="template_booking_review" name="Booking Review">-->
+<!--    <t t-call="website.layout">-->
+<!--        <div class="container">-->
+<!--            <h1>Booking Review</h1>-->
+<!--            <p>Room: <strong><t t-esc="room.name"/></strong></p>-->
+<!--            <p>Check-in Date: <strong><t t-esc="check_in_date"/></strong></p>-->
+<!--            <p>Check-out Date: <strong><t t-esc="check_out_date"/></strong></p>-->
+<!--            <p>Total Price: <strong><t t-esc="total_price"/> USD</strong></p>-->
+<!--            <form action="/hotel/book_room" method="POST">-->
+<!--                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>-->
+<!--                <input type="hidden" name="room_id" t-att-value="room.id"/>-->
+<!--                <input type="hidden" name="check_in_date" t-att-value="check_in_date"/>-->
+<!--                <input type="hidden" name="check_out_date" t-att-value="check_out_date"/>-->
+<!--                <input type="hidden" name="total_price" t-att-value="total_price"/>-->
+<!--                <button type="submit" class="btn btn-success">Confirm Booking</button>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </t>-->
+<!--</template>-->
+
+</odoo>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Root Menu -->
+    <menuitem id="menu_hotel_management_root" name="Hotel Management" sequence="1"/>
+    <!-- Submenu: Hotels -->
+    <menuitem id="menu_hotel_management_hotels" name="Hotels"
+              parent="menu_hotel_management_root"
+              action="action_hotel_management_hotels"
+              sequence="2"/>
+    <!-- Submenu: Rooms -->
+    <menuitem id="menu_hotel_management_rooms" name="Rooms"
+              parent="menu_hotel_management_root"
+              action="action_hotel_management_rooms"
+              sequence="3"/>
+
+    <!-- Submenu: Room Features -->
+    <menuitem id="menu_hotel_management_room_features" name="Room Features"
+              parent="menu_hotel_management_root"
+              action="action_hotel_management_room_features"
+              sequence="4"/>
+
+    <!-- Submenu: Bookings -->
+    <menuitem id="menu_hotel_management_bookings" name="Bookings"
+              parent="menu_hotel_management_root"
+              action="action_hotel_management_bookings"
+              sequence="5"/>
+<!-- New Menu Item for Booking Chờ Duyệt (linked to new bookings action) -->
+    <menuitem id="menu_booking_new" name="Booking Chờ Duyệt"
+            parent="menu_hotel_management_root"
+            action="action_hotel_management_new_bookings"
+            sequence="6"/>
+   <!-- Submenu: Service under Bookings -->
+    <menuitem id="menu_booking_service" name="Service"
+            parent="menu_hotel_management_root"
+            action="action_hotel_management_service"
+            sequence="7"/>
+
+    <menuitem id="menu_hotel_service_line"
+              name="Hotel Service Lines"
+              parent="menu_hotel_management_root"
+              action="action_service_line"/>
+
+    <menuitem id="menu_hotel_management_available_rooms"
+                  name="Customer Available Rooms"
+                  parent="menu_hotel_management_root"
+                  action="action_hotel_management_available_rooms"/>
+
+
+
+<!--    action="action_hotel_room_occupancy_report"-->
+
+<!--      action="action_hotel_revenue_report"-->
+<!--        &lt;!&ndash; Submenu: Hotel Services &ndash;&gt;-->
+<!--    <menuitem id="menu_hotel_management_services"-->
+<!--                  name="Customer Hotel Services"-->
+<!--                  parent="menu_hotel_management_root"-->
+<!--                  action="action_hotel_management_services"/>-->
+
+
+
+
+<!--   <menuitem id="menu_hotel_reporting"-->
+<!--              name="Reports"-->
+<!--              parent="menu_hotel_management_root"-->
+<!--              sequence="7"/>-->
+<!--    <menuitem id="menu_hotel_report_booking"-->
+<!--              name="Booking Report"-->
+<!--              action="action_report_booking"-->
+<!--              parent="menu_hotel_reporting"-->
+<!--              sequence="8"/>-->
+<!--    <menuitem id="menu_hotel_report_wizard"-->
+<!--              name="Generate Reports"-->
+<!--              action="action_hotel_report_wizard"-->
+<!--              parent="menu_hotel_reporting"-->
+<!--              sequence="8"/>-->
+<!--    <record id="action_hotel_report_wizard" model="ir.actions.act_window">-->
+<!--        <field name="name">Generate Reports</field>-->
+<!--        <field name="res_model">hotel.management.report.wizard</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--    </record>-->
+<!--    <menuitem id="menu_hotel_occupancy_report"-->
+<!--              name="Room Occupancy Analysis"-->
+<!--              action="action_hotel_room_occupancy_report"-->
+<!--              parent="menu_hotel_reporting"-->
+<!--              sequence="9"/>-->
+<!--    <record id="action_hotel_room_occupancy_report" model="ir.actions.act_window">-->
+<!--        <field name="name">Room Occupancy Analysis</field>-->
+<!--        <field name="res_model">hotel.management.room.occupancy.report</field>-->
+<!--        <field name="view_mode">pivot</field>-->
+<!--    </record>-->
+<!--    <menuitem id="menu_hotel_revenue_report"-->
+<!--              name="Revenue Analysis"-->
+<!--              action="action_hotel_revenue_report"-->
+<!--              parent="menu_hotel_reporting"-->
+<!--              sequence="10"/>-->
+<!--    <record id="action_hotel_revenue_report" model="ir.actions.act_window">-->
+<!--        <field name="name">Revenue Analysis</field>-->
+<!--        <field name="res_model">hotel.management.revenue.report</field>-->
+<!--        <field name="view_mode">pivot</field>-->
+<!--    </record>-->
+</odoo>

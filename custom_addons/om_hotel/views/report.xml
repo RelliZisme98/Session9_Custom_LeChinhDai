@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <report
+        id="action_report_booking"
+        model="hotel.management.booking"
+        string="Booking Report"
+        report_type="qweb-html"
+        name="om_hotel.report_booking"
+        file="om_hotel.report_booking"
+        print_report_name="'Booking Report - %s' % (object.name)"
+    />
+</odoo>

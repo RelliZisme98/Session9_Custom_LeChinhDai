@@ -1,0 +1,28 @@
+<odoo>
+     <!-- Revenue Report Views -->
+    <record id="view_hotel_revenue_report_pivot" model="ir.ui.view">
+        <field name="name">hotel.revenue.report.pivot</field>
+        <field name="model">hotel.revenue.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Revenue Analysis">
+                <field name="date" type="row"/>
+                <field name="bed_type" type="col"/>
+                <field name="room_revenue" type="measure"/>
+                <field name="service_revenue" type="measure"/>
+                <field name="total_revenue" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_hotel_revenue_report_graph" model="ir.ui.view">
+        <field name="name">hotel.revenue.report.graph</field>
+        <field name="model">hotel.revenue.report</field>
+        <field name="arch" type="xml">
+            <graph string="Revenue Analysis" type="bar" stacked="True">
+                <field name="date"/>
+                <field name="bed_type"/>
+                <field name="total_revenue" type="measure"/>
+            </graph>
+        </field>
+    </record>
+</odoo>
