@@ -1,0 +1,28 @@
+<odoo>
+    <!-- Room Occupancy Report Views -->
+    <record id="view_hotel_room_occupancy_report_pivot" model="ir.ui.view">
+        <field name="name">hotel.room.occupancy.report.pivot</field>
+        <field name="model">hotel.room.occupancy.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Room Occupancy Analysis">
+                <field name="date" type="row"/>
+                <field name="room_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="revenue" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_hotel_room_occupancy_report_graph" model="ir.ui.view">
+        <field name="name">hotel.room.occupancy.report.graph</field>
+        <field name="model">hotel.room.occupancy.report</field>
+        <field name="arch" type="xml">
+            <graph string="Room Occupancy Analysis" type="line">
+                <field name="date"/>
+                <field name="state"/>
+                <field name="revenue" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+</odoo>

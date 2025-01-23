@@ -1,4 +1,6 @@
 from odoo.tests.common import TransactionCase
+from odoo.exceptions import ValidationError
+from datetime import date, timedelta
 from odoo import exceptions
 
 class TestBooking(TransactionCase):
@@ -119,3 +121,137 @@ class TestBooking(TransactionCase):
                     'bed_type': 'suite',
                     'room_id': room.id
                 })
+
+                # tests/test_hotel_room.py
+
+
+                class TestHotelRoom(TransactionCase):
+                    def setUp(self):
+                        super().setUp()
+                        self.room = self.env['hotel.management.room'].create({
+                            'name': 'Test Room 101',
+                            'room_type': 'double',
+                            'weekday_price': 100.0,
+                            'weekend_price': 150.0,
+                            'capacity': 2,
+                            'floor': 1
+                        })
+
+                        self.partner = self.env['res.partner'].create({
+                            'name': 'Test Customer',
+                            'email': 'test@example.com'
+                        })
+
+                    def test_room_creation(self):
+                        """Test room creation and default values"""
+                        self.assertEqual(self.room.state, 'available')
+                        self.assertEqual(self.room.room_type, 'double')
+                        self.assertEqual(self.room.weekday_price, 100.0)
+
+                    def test_room_state_computation(self):
+                        """Test room state changes based on bookings"""
+                        booking = self.env['hotel.management.booking'].create({
+                            'partner_id': self.partner.id,
+                            'room_id': self.room.id,
+                            'check_in_date': date.today(),
+                            'check_out_date': date.today() + timedelta(days=2)
+                        })
+                        booking.action_confirm()
+                        self.assertEqual(self.room.state, 'occupied')
+
+                # tests/test_hotel_booking.py
+                class TestHotelBooking(TransactionCase):
+                    def setUp(self):
+                        super().setUp()
+                        self.room = self.env['hotel.management.room'].create({
+                            'name': 'Test Room 102',
+                            'room_type': 'single',
+                            'weekday_price': 80.0,
+                            'weekend_price': 120.0
+                        })
+
+                        self.partner = self.env['res.partner'].create({
+                            'name': 'Test Customer',
+                            'email': 'test@example.com'
+                        })
+
+                    def test_booking_creation(self):
+                        """Test booking creation and validation"""
+                        booking = self.env['hotel.management.booking'].create({
+                            'partner_id': self.partner.id,
+                            'room_id': self.room.id,
+                            'check_in_date': date.today(),
+                            'check_out_date': date.today() + timedelta(days=3)
+                        })
+                        self.assertEqual(booking.duration, 3)
+                        self.assertEqual(booking.state, 'draft')
+
+                    def test_booking_confirmation(self):
+                        """Test booking confirmation process"""
+                        booking = self.env['hotel.management.booking'].create({
+                            'partner_id': self.partner.id,
+                            'room_id': self.room.id,
+                            'check_in_date': date.today(),
+                            'check_out_date': date.today() + timedelta(days=1)
+                        })
+                        booking.action_confirm()
+                        self.assertEqual(booking.state, 'confirmed')
+                        self.assertTrue(booking.sale_order_id, "Sale order should be created")
+
+                    def test_overlapping_bookings(self):
+                        """Test prevention of overlapping bookings"""
+                        booking1 = self.env['hotel.management.booking'].create({
+                            'partner_id': self.partner.id,
+                            'room_id': self.room.id,
+                            'check_in_date': date.today(),
+                            'check_out_date': date.today() + timedelta(days=2)
+                        })
+                        booking1.action_confirm()
+
+                        with self.assertRaises(ValidationError):
+                            booking2 = self.env['hotel.management.booking'].create({
+                                'partner_id': self.partner.id,
+                                'room_id': self.room.id,
+                                'check_in_date': date.today() + timedelta(days=1),
+                                'check_out_date': date.today() + timedelta(days=3)
+                            })
+                            booking2.action_confirm()
+
+                # tests/test_hotel_services.py
+                class TestHotelServices(TransactionCase):
+                    def setUp(self):
+                        super().setUp()
+                        self.room = self.env['hotel.management.room'].create({
+                            'name': 'Test Room 103',
+                            'room_type': 'suite',
+                            'weekday_price': 200.0,
+                            'weekend_price': 300.0
+                        })
+
+                        self.product = self.env['product.product'].create({
+                            'name': 'Room Service',
+                            'type': 'service',
+                            'list_price': 50.0
+                        })
+
+                        self.booking = self.env['hotel.management.booking'].create({
+                            'partner_id': self.partner.id,
+                            'room_id': self.room.id,
+                            'check_in_date': date.today(),
+                            'check_out_date': date.today() + timedelta(days=1)
+                        })
+
+                    def test_service_addition(self):
+                        """Test adding services to booking"""
+                        service_line = self.env['hotel.service'].create({
+                            'booking_id': self.booking.id,
+                            'product_id': self.product.id,
+                            'quantity': 2,
+                            'unit_price': 50.0
+                        })
+                        self.assertEqual(service_line.price_total, 100.0)
+                        self.booking.action_confirm()
+                        self.assertIn(
+                            self.product.name,
+                            self.booking.sale_order_id.order_line.mapped('name')
+                        )

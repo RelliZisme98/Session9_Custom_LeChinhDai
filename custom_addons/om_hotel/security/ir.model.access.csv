@@ -22,4 +22,14 @@ access_booking_payment_wizard,access.booking.payment.wizard,model_booking_paymen
 access_booking_employee,access_booking_employee,model_booking_payment_wizard,om_hotel.group_hotel_employee,1,1,1,0
 access_booking_manager,access_booking_manager,model_booking_payment_wizard,om_hotel.group_hotel_manager,1,1,1,0
 
+access_hotel_service_line,access_hotel_service_line,model_hotel_service_line,om_hotel.group_hotel_admin,1,1,1,1
+
 access_hotel_service,access_hotel_service,model_hotel_service,om_hotel.group_hotel_admin,1,1,1,1
+
+access_hotel_service_line,access_hotel_service_line,model_hotel_service_line,om_hotel.group_hotel_admin,1,1,1,1
+
+access_hotel_room_occupancy_report,access_hotel_room_occupancy_report,model_hotel_room_occupancy_report,om_hotel.group_hotel_admin,1,1,1,1
+
+access_hotel_revenue_report,access_hotel_revenue_report,model_hotel_revenue_report,om_hotel.group_hotel_admin,1,1,1,1
+
+

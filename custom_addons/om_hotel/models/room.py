@@ -11,12 +11,14 @@ class Room(models.Model):
     name = fields.Char(string='Room Number', required=True)
     hotel_id = fields.Many2one('hotel.management.hotel', string='Hotel', required=True, ondelete='cascade')
     address = fields.Char(string='Hotel Address', related='hotel_id.address', store=True, readonly=True)
-    bed_type = fields.Selection([('single', 'Single Bed'), ('double', 'Double Bed')], string='Bed Type', required=True)
-    price = fields.Float(string='Room Price', required=True)
+    bed_type = fields.Selection([('single', 'Single Bed'), ('double', 'Double Bed'), ('suite','Suite Bed')], string='Bed Type', required=True)
+    # price = fields.Float(string='Room Price', required=True)
+    # Pricing
+    weekday_price = fields.Float(string='Weekday Price', required=True)
+    weekend_price = fields.Float(string='Weekend Price', required=True)
     feature_ids = fields.Many2many('hotel.management.room.feature', string='Room Features')
     state = fields.Selection([('available', 'Available'), ('booked', 'Booked'),('maintenance', 'Under Maintenance')], string='Room Status', default='available')
-    # last_rented_date = fields.Date(string='Last Rented Date', default=fields.Date.today)
-    last_rented_date = fields.Date(string='Last Rented Date', required=True)
+    last_rented_date = fields.Date(string='Last Rented Date', default=fields.Date.today)
     product_id = fields.Many2one('product.product', string='Product', required=True)
     @api.model
     def write(self, vals):
@@ -27,12 +29,12 @@ class Room(models.Model):
 
     @api.constrains('bed_type', 'product_id')
     def _check_bed_type_and_product(self):
-        valid_bed_types = ['single', 'double']
+        valid_bed_types = ['single', 'double', 'suite']
         for record in self:
             if record.bed_type not in valid_bed_types:
                 raise ValidationError('Invalid bed type: %s' % record.bed_type)
-            if not record.product_id:
-                raise ValidationError('Room %s is missing a product.' % record.name)
+            # if not record.product_id:
+            #     raise ValidationError('Room %s is missing a product.' % record.name)
 
 
     _sql_constraints = [

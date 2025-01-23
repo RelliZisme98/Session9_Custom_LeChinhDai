@@ -18,7 +18,9 @@
                 <field name="name"/>
                 <field name="hotel_id"/>
                 <field name="bed_type"/>
-                <field name="price"/>
+<!--                <field name="price"/>-->
+                <field name="weekday_price"/>
+                <field name="weekend_price"/>
                 <field name="state"/>
                  <field name="last_rented_date"/>
             </list>
@@ -36,7 +38,9 @@
                         <field name="hotel_id"/>
                         <field name="address" readonly="1"/>
                         <field name="bed_type"/>
-                        <field name="price"/>
+<!--                        <field name="price"/>-->
+                        <field name="weekday_price"/>
+                        <field name="weekend_price"/>
                         <field name="state"/>
 <!--                        <field name="last_rented_date" readonly="1"/>-->
                         <field name="last_rented_date"/>
